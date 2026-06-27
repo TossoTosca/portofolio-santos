@@ -1,26 +1,105 @@
-@import "tailwindcss";
+@import '../styles/variables.css';
+@import '../styles/animations.css';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+    scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    background: var(--background);
+
+    color: var(--text-primary);
+
+    transition: background 0.4s;
+
+    overflow-x: hidden;
+
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+button {
+    border: none;
+
+    outline: none;
+
+    background: none;
+}
+
+a {
+    color: inherit;
+
+    text-decoration: none;
+}
+
+img {
+    display: block;
+
+    max-width: 100%;
+}
+
+::selection {
+    background: var(--accent);
+
+    color: white;
+}
+
+.project-image {
+    transform: scale(1);
+}
+
+.glass-card:hover .project-image {
+    transform: scale(1.05);
+}
+
+/* Hide scrollbar (Chrome, Edge, Safari) */
+.projects-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar (Firefox) */
+.projects-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+@keyframes floatGlow {
+    0% {
+        transform: translateX(-50%) translateY(0px);
+    }
+    50% {
+        transform: translateX(-50%) translateY(40px);
+    }
+    100% {
+        transform: translateX(-50%) translateY(0px);
+    }
+}
+
+@keyframes floatGlow2 {
+    0% {
+        transform: translateY(0px) translateX(0px);
+    }
+    50% {
+        transform: translateY(-30px) translateX(20px);
+    }
+    100% {
+        transform: translateY(0px) translateX(0px);
+    }
+}
+
+@keyframes floatGlow3 {
+    0% {
+        transform: translateY(0px) translateX(0px);
+    }
+    50% {
+        transform: translateY(30px) translateX(-25px);
+    }
+    100% {
+        transform: translateY(0px) translateX(0px);
+    }
 }

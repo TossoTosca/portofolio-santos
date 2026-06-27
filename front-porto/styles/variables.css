@@ -1,0 +1,59 @@
+:root {
+    /* ========= Colors ========= */
+
+    --background: #f5f5f7;
+
+    --surface: rgba(255, 255, 255, 0.65);
+
+    --surface-hover: rgba(255, 255, 255, 0.82);
+
+    --text-primary: #1d1d1f;
+
+    --text-secondary: #6e6e73;
+
+    --accent: #007aff;
+
+    --border: rgba(255, 255, 255, 0.45);
+
+    /* ========= Radius ========= */
+
+    --radius-sm: 12px;
+
+    --radius-md: 20px;
+
+    --radius-lg: 28px;
+
+    --radius-pill: 999px;
+
+    /* ========= Shadow ========= */
+
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+    --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.12);
+
+    /* ========= Blur ========= */
+
+    --blur: blur(24px);
+
+    /* ========= Transition ========= */
+
+    --transition: 0.35s ease;
+}
+
+[data-theme='dark'] {
+    --background: #000000;
+
+    --surface: rgba(30, 30, 30, 0.55);
+
+    --surface-hover: rgba(45, 45, 45, 0.75);
+
+    --text-primary: #ffffff;
+
+    --text-secondary: #b0b0b5;
+
+    --accent: #0a84ff;
+
+    --border: rgba(255, 255, 255, 0.08);
+}
