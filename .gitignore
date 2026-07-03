@@ -1,0 +1,10 @@
+# Local Codex workspace state
+.codex/
+
+# Generated temporary files
+tmp/
+**/__pycache__/
+*.pyc
+
+# Legacy, unused portfolio asset
+front-porto/public/icons/santos-icon.png

@@ -1,281 +1,413 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import GlassCard from '@/components/ui/GlassCard';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+    ArrowLeft,
+    ArrowRight,
+    Blocks,
+    ExternalLink,
+    GalleryHorizontal,
+    Images,
+    Move,
+    Radio,
+    Route,
+    Wind,
+    X,
+    Zap,
+} from 'lucide-react';
+import GlassCard from '@/components/ui/GlassCard';
 
-const projects = [
+type TechKind =
+    | 'react'
+    | 'typescript'
+    | 'vue'
+    | 'vite'
+    | 'tailwind'
+    | 'router'
+    | 'motion'
+    | 'shadcn'
+    | 'embla'
+    | 'socket';
+
+interface Technology {
+    name: string;
+    kind: TechKind;
+}
+
+interface Project {
+    id: number;
+    title: string;
+    eyebrow: string;
+    description: string;
+    tech: Technology[];
+    story: string;
+    images: string[];
+    liveUrl: string;
+}
+
+const projects: Project[] = [
     {
         id: 1,
-        title: 'Project 1',
-        desc: 'Internal dashboard for monitoring system.',
-        tech: 'Next.js • TypeScript • Firebase',
-        story: 'This project was built to manage internal company metrics, user tracking, and analytics dashboard with real-time updates.',
-        img: '/projects/risk-dashboard.png',
+        title: 'HVZ Mobilindo',
+        eyebrow: 'AUTOMOTIVE MARKETPLACE',
+        description:
+            'A polished used-car marketplace that makes inventory discovery and selling enquiries feel direct and trustworthy.',
+        tech: [
+            { name: 'React 19', kind: 'react' },
+            { name: 'Vite 8', kind: 'vite' },
+            { name: 'TypeScript', kind: 'typescript' },
+            { name: 'Tailwind CSS', kind: 'tailwind' },
+            { name: 'React Router', kind: 'router' },
+            { name: 'Framer Motion', kind: 'motion' },
+            { name: 'Shadcn UI', kind: 'shadcn' },
+            { name: 'Embla Carousel', kind: 'embla' },
+        ],
+        story: 'The public experience brings vehicle inventory, services, and selling enquiries into one focused journey. Its dark automotive identity, clear calls to action, and responsive presentation help visitors move from interest to contact without unnecessary friction.',
+        images: Array.from(
+            { length: 8 },
+            (_, index) => `/projects/hvzmobilindo_assets/${index + 1}.jpg`
+        ),
+        liveUrl: 'https://hvzmobilindo.vercel.app/',
     },
     {
         id: 2,
-        title: 'Project 2',
-        desc: 'Automation system using WhatsApp Web API.',
-        tech: 'Node.js • Express • WhatsApp API',
-        story: 'Built automation system for sending bulk messages and managing WhatsApp workflows for business operations.',
-        img: '/projects/whatsapp-tool.png',
+        title: 'HVZ Mobilindo CMS',
+        eyebrow: 'ADMIN DASHBOARD',
+        description:
+            'An operational dashboard for managing inventory, public content, sales activity, and incoming leads.',
+        tech: [
+            { name: 'React 19', kind: 'react' },
+            { name: 'Vite 8', kind: 'vite' },
+            { name: 'TypeScript', kind: 'typescript' },
+            { name: 'Tailwind CSS', kind: 'tailwind' },
+            { name: 'React Router', kind: 'router' },
+            { name: 'Shadcn UI', kind: 'shadcn' },
+        ],
+        story: 'The CMS turns the public marketplace into a manageable product. It separates inventory, content, and sales workflows into clear operational areas while keeping key business signals visible from the dashboard.',
+        images: Array.from(
+            { length: 5 },
+            (_, index) => `/projects/hvzmobilindo_cms_assets/${index + 1}.jpg`
+        ),
+        liveUrl: 'https://hvzmobilindo.vercel.app/dashboard',
     },
     {
         id: 3,
-        title: 'Project 3',
-        desc: 'Management system for internal operations.',
-        tech: 'React • Node.js',
-        story: 'A scalable admin system designed for handling multi-role access and data visualization.',
-        img: '/projects/risk-dashboard.png',
-    },
-    {
-        id: 4,
-        title: 'Project 4',
-        desc: 'Internal dashboard for monitoring system.',
-        tech: 'Next.js • TypeScript • Firebase',
-        story: 'This project was built to manage internal company metrics, user tracking, and analytics dashboard with real-time updates.',
-        img: '/projects/risk-dashboard.png',
-    },
-    {
-        id: 5,
-        title: 'Project 5',
-        desc: 'Automation system using WhatsApp Web API.',
-        tech: 'Node.js • Express • WhatsApp API',
-        story: 'Built automation system for sending bulk messages and managing WhatsApp workflows for business operations.',
-        img: '/projects/whatsapp-tool.png',
-    },
-    {
-        id: 6,
-        title: 'Project 6',
-        desc: 'Management system for internal operations.',
-        tech: 'React • Node.js',
-        story: 'A scalable admin system designed for handling multi-role access and data visualization.',
-        img: '/projects/risk-dashboard.png',
+        title: 'WhatsApp Automation Reply',
+        eyebrow: 'BUSINESS AUTOMATION',
+        description:
+            'A focused dashboard for configuring automatic replies, contact rules, and recurring WhatsApp workflows.',
+        tech: [
+            { name: 'Vue 3', kind: 'vue' },
+            { name: 'Vite 8', kind: 'vite' },
+            { name: 'Socket.IO', kind: 'socket' },
+            { name: 'Tailwind CSS', kind: 'tailwind' },
+        ],
+        story: 'The product helps teams manage repetitive customer conversations through keyword replies, fallback messages, contact rules, and real-time activity. Its interface keeps complex automation controls approachable and easy to review.',
+        images: Array.from(
+            { length: 4 },
+            (_, index) => `/projects/wa_automation_assets/${index + 1}.jpg`
+        ),
+        liveUrl: 'https://whatsapp-automation-reply.vercel.app/',
     },
 ];
 
-const overlayVariant = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { duration: 0.25 } },
-    exit: { opacity: 0, transition: { duration: 0.2 } },
-};
-
-const modalVariant = {
-    hidden: { opacity: 0, scale: 0.92, y: 20 },
-    show: {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        transition: { duration: 0.35 },
-    },
-    exit: { opacity: 0, scale: 0.96, y: 10, transition: { duration: 0.2 } },
-};
-
 export default function Projects() {
     const scrollRef = useRef<HTMLDivElement>(null);
-    const [selected, setSelected] = useState<any>(null);
+    const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+    const [galleryIndex, setGalleryIndex] = useState(0);
+    const selected = selectedIndex === null ? null : projects[selectedIndex];
 
-    const scroll = (dir: 'left' | 'right') => {
-        if (!scrollRef.current) return;
-
-        scrollRef.current.scrollBy({
-            left: dir === 'left' ? -420 : 420,
+    const scroll = (direction: 'left' | 'right') => {
+        scrollRef.current?.scrollBy({
+            left: direction === 'left' ? -420 : 420,
             behavior: 'smooth',
         });
     };
 
+    const openProject = (index: number) => {
+        setSelectedIndex(index);
+        setGalleryIndex(0);
+    };
+
+    const moveProject = (direction: -1 | 1) => {
+        setSelectedIndex((current) => {
+            if (current === null) return 0;
+            return (current + direction + projects.length) % projects.length;
+        });
+        setGalleryIndex(0);
+    };
+
+    const moveGallery = (direction: -1 | 1) => {
+        if (!selected) return;
+        setGalleryIndex(
+            (current) =>
+                (current + direction + selected.images.length) %
+                selected.images.length
+        );
+    };
+
+    useEffect(() => {
+        if (selectedIndex === null) return;
+
+        const previousOverflow = document.body.style.overflow;
+        const imageCount = projects[selectedIndex].images.length;
+        document.body.style.overflow = 'hidden';
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') setSelectedIndex(null);
+            if (event.key === 'ArrowLeft') {
+                setGalleryIndex(
+                    (current) => (current - 1 + imageCount) % imageCount
+                );
+            }
+            if (event.key === 'ArrowRight') {
+                setGalleryIndex((current) => (current + 1) % imageCount);
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [selectedIndex]);
+
     return (
-        <section
-            id="projects"
-            style={{
-                minHeight: '100vh',
-                padding: '120px 24px',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
-            {/* HEADER */}
-            <div style={{ maxWidth: 1100, margin: '0 auto', width: '100%' }}>
-                <div style={{ marginBottom: 40 }}>
-                    <div
-                        style={{
-                            fontSize: 14,
-                            letterSpacing: 2,
-                            color: 'var(--text-secondary)',
-                        }}
-                    >
-                        PROJECTS
+        <section id="projects" className="content-section section-shell">
+            <div className="section-container">
+                <div className="projects-heading-row">
+                    <div className="section-heading">
+                        <p className="section-eyebrow">SELECTED WORK</p>
+                        <h2 className="section-title">Projects with purpose</h2>
+                        <p className="section-lead">
+                            Product experiences built around real workflows,
+                            clear decisions, and practical outcomes.
+                        </p>
                     </div>
-
-                    <h2 style={{ fontSize: 42, fontWeight: 600 }}>
-                        Working Experience
-                    </h2>
-                </div>
-
-                {/* ARROWS */}
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        marginBottom: 20,
-                    }}
-                >
-                    <button style={arrowBtn} onClick={() => scroll('left')}>
-                        ←
-                    </button>
-
-                    <button style={arrowBtn} onClick={() => scroll('right')}>
-                        →
-                    </button>
-                </div>
-
-                {/* SCROLL ROW */}
-                <div
-                    className="projects-scroll"
-                    ref={scrollRef}
-                    style={{
-                        display: 'flex',
-                        gap: 30,
-                        overflowX: 'auto',
-                        scrollBehavior: 'smooth',
-                        paddingBottom: 20,
-                    }}
-                >
-                    {projects.map((p) => (
-                        <div
-                            key={p.id}
-                            style={{
-                                minWidth: 360,
-                                flex: '0 0 auto',
-                                cursor: 'pointer',
-                            }}
-                            onClick={() => setSelected(p)}
+                    <div
+                        className="carousel-controls"
+                        aria-label="Project navigation"
+                    >
+                        <button
+                            type="button"
+                            onClick={() => scroll('left')}
+                            aria-label="Previous projects"
                         >
-                            <GlassCard
-                                style={{
-                                    borderRadius: 24,
-                                    overflow: 'hidden',
-                                }}
-                            >
-                                <div
-                                    style={{
-                                        position: 'relative',
-                                        height: 220,
-                                    }}
-                                >
-                                    <Image
-                                        src={p.img}
-                                        alt={p.title}
-                                        fill
-                                        style={{ objectFit: 'cover' }}
-                                    />
-                                </div>
+                            <ArrowLeft size={19} />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => scroll('right')}
+                            aria-label="Next projects"
+                        >
+                            <ArrowRight size={19} />
+                        </button>
+                    </div>
+                </div>
 
-                                <div style={{ padding: 20 }}>
-                                    <h3 style={{ fontSize: 20 }}>{p.title}</h3>
-                                    <p
-                                        style={{
-                                            fontSize: 13,
-                                            color: 'gray',
-                                        }}
-                                    >
-                                        {p.desc}
-                                    </p>
-                                    <div style={{ fontSize: 12 }}>{p.tech}</div>
+                <div className="projects-scroll" ref={scrollRef}>
+                    {projects.map((project, index) => (
+                        <button
+                            type="button"
+                            className="project-card-button"
+                            key={project.id}
+                            onClick={() => openProject(index)}
+                            aria-label={`View details for ${project.title}`}
+                        >
+                            <GlassCard className="project-card">
+                                <div className="project-image-wrap">
+                                    <Image
+                                        src={project.images[0]}
+                                        alt={`${project.title} project preview`}
+                                        fill
+                                        sizes="(max-width: 720px) 88vw, 460px"
+                                        className="project-image"
+                                    />
+                                    <span className="project-image-count">
+                                        <Images size={14} />
+                                        {project.images.length} screens
+                                    </span>
+                                    <div className="project-tech-float">
+                                        {project.tech
+                                            .slice(0, 3)
+                                            .map((technology) => (
+                                                <TechBadge
+                                                    key={technology.name}
+                                                    technology={technology}
+                                                    compact
+                                                />
+                                            ))}
+                                    </div>
+                                </div>
+                                <div className="project-card-copy">
+                                    <p>{project.eyebrow}</p>
+                                    <h3>{project.title}</h3>
+                                    <span>{project.description}</span>
                                 </div>
                             </GlassCard>
-                        </div>
+                        </button>
                     ))}
                 </div>
             </div>
 
-            {/* ===================== MODAL ===================== */}
             <AnimatePresence>
-                {selected && (
+                {selected && selectedIndex !== null && (
                     <motion.div
-                        variants={overlayVariant}
-                        initial="hidden"
-                        animate="show"
-                        exit="exit"
-                        style={overlayStyle}
-                        onClick={() => setSelected(null)}
+                        className="project-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onMouseDown={() => setSelectedIndex(null)}
                     >
                         <motion.div
-                            variants={modalVariant}
-                            initial="hidden"
-                            animate="show"
-                            exit="exit"
-                            onClick={(e) => e.stopPropagation()}
-                            style={modalWrapper}
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="project-dialog-title"
+                            className="project-dialog"
+                            initial={{ opacity: 0, scale: 0.97, y: 16 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.98, y: 8 }}
+                            transition={{ duration: 0.24 }}
+                            onMouseDown={(event) => event.stopPropagation()}
                         >
-                            <GlassCard
-                                style={{
-                                    width: 'min(900px, 92vw)',
-                                    borderRadius: 24,
-                                    overflow: 'hidden',
-                                    padding: 0,
-                                }}
-                            >
-                                {/* IMAGE */}
-                                <div
-                                    style={{
-                                        position: 'relative',
-                                        height: 420,
-                                    }}
+                            <GlassCard className="project-dialog-card">
+                                <button
+                                    type="button"
+                                    className="dialog-close"
+                                    aria-label="Close project details"
+                                    onClick={() => setSelectedIndex(null)}
+                                    autoFocus
                                 >
-                                    <Image
-                                        src={selected.img}
-                                        alt={selected.title}
-                                        fill
-                                        style={{
-                                            objectFit: 'cover',
-                                            transform: 'scale(1.02)',
-                                        }}
-                                    />
-                                </div>
+                                    <X size={19} />
+                                </button>
 
-                                {/* CONTENT */}
-                                <div style={{ padding: 30 }}>
-                                    <h2 style={{ fontSize: 28 }}>
-                                        {selected.title}
-                                    </h2>
-
-                                    <p
-                                        style={{
-                                            marginTop: 10,
-                                            color: 'var(--text-secondary)',
-                                        }}
-                                    >
-                                        {selected.desc}
-                                    </p>
-
-                                    <p
-                                        style={{
-                                            marginTop: 18,
-                                            lineHeight: 1.6,
-                                        }}
-                                    >
-                                        {selected.story}
-                                    </p>
-
-                                    <div
-                                        style={{
-                                            marginTop: 18,
-                                            fontSize: 13,
-                                            color: 'var(--text-secondary)',
-                                        }}
-                                    >
-                                        {selected.tech}
+                                <div className="project-gallery">
+                                    <div className="dialog-image-wrap">
+                                        <AnimatePresence
+                                            mode="wait"
+                                            initial={false}
+                                        >
+                                            <motion.div
+                                                key={
+                                                    selected.images[
+                                                        galleryIndex
+                                                    ]
+                                                }
+                                                className="dialog-image-motion"
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{ duration: 0.18 }}
+                                            >
+                                                <Image
+                                                    src={
+                                                        selected.images[
+                                                            galleryIndex
+                                                        ]
+                                                    }
+                                                    alt={`${selected.title} screen ${galleryIndex + 1}`}
+                                                    fill
+                                                    sizes="(max-width: 820px) 92vw, 56vw"
+                                                    priority
+                                                />
+                                            </motion.div>
+                                        </AnimatePresence>
+                                        <div className="gallery-controls">
+                                            <button
+                                                type="button"
+                                                onClick={() => moveGallery(-1)}
+                                                aria-label="Previous project image"
+                                            >
+                                                <ArrowLeft size={18} />
+                                            </button>
+                                            <span>
+                                                {galleryIndex + 1} /{' '}
+                                                {selected.images.length}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => moveGallery(1)}
+                                                aria-label="Next project image"
+                                            >
+                                                <ArrowRight size={18} />
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <button
-                                        onClick={() => setSelected(null)}
-                                        style={closeBtn}
+                                    <div className="gallery-thumbnails">
+                                        {selected.images.map((image, index) => (
+                                            <button
+                                                key={image}
+                                                type="button"
+                                                className={
+                                                    galleryIndex === index
+                                                        ? 'is-active'
+                                                        : ''
+                                                }
+                                                onClick={() =>
+                                                    setGalleryIndex(index)
+                                                }
+                                                aria-label={`Show image ${index + 1}`}
+                                            >
+                                                <Image
+                                                    src={image}
+                                                    alt=""
+                                                    fill
+                                                    sizes="90px"
+                                                />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="dialog-copy">
+                                    <p className="section-eyebrow">
+                                        {selected.eyebrow}
+                                    </p>
+                                    <h2 id="project-dialog-title">
+                                        {selected.title}
+                                    </h2>
+                                    <p className="dialog-description">
+                                        {selected.description}
+                                    </p>
+                                    <p className="dialog-story">
+                                        {selected.story}
+                                    </p>
+                                    <div className="project-tech-list">
+                                        {selected.tech.map((technology) => (
+                                            <TechBadge
+                                                key={technology.name}
+                                                technology={technology}
+                                            />
+                                        ))}
+                                    </div>
+                                    <a
+                                        className="button button-primary"
+                                        href={selected.liveUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
                                     >
-                                        Close
-                                    </button>
+                                        Visit live project{' '}
+                                        <ExternalLink size={16} />
+                                    </a>
+                                    <div className="dialog-navigation">
+                                        <button
+                                            type="button"
+                                            onClick={() => moveProject(-1)}
+                                        >
+                                            <ArrowLeft size={17} /> Previous
+                                            project
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => moveProject(1)}
+                                        >
+                                            Next project{' '}
+                                            <ArrowRight size={17} />
+                                        </button>
+                                    </div>
                                 </div>
                             </GlassCard>
                         </motion.div>
@@ -286,37 +418,40 @@ export default function Projects() {
     );
 }
 
-// ===================== STYLES =====================
+function TechBadge({
+    technology,
+    compact = false,
+}: {
+    technology: Technology;
+    compact?: boolean;
+}) {
+    return (
+        <span
+            className={`tech-badge tech-${technology.kind}${compact ? ' is-compact' : ''}`}
+        >
+            <span className="tech-badge-icon" aria-hidden="true">
+                <TechIcon kind={technology.kind} />
+            </span>
+            <span>{technology.name}</span>
+        </span>
+    );
+}
 
-const arrowBtn: React.CSSProperties = {
-    padding: '10px 16px',
-    borderRadius: 999,
-    border: '1px solid #ccc',
-    background: 'transparent',
-    cursor: 'pointer',
-};
-
-const overlayStyle: React.CSSProperties = {
-    position: 'fixed',
-    inset: 0,
-    backdropFilter: 'blur(10px)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 999,
-};
-
-const modalWrapper: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-};
-
-const closeBtn: React.CSSProperties = {
-    marginTop: 20,
-    padding: '10px 16px',
-    borderRadius: 999,
-    border: '1px solid #ccc',
-    background: 'white',
-    cursor: 'pointer',
-};
+function TechIcon({ kind }: { kind: TechKind }) {
+    if (kind === 'react') {
+        return <Image src="/icons/react.svg" alt="" width={16} height={16} />;
+    }
+    if (kind === 'typescript') {
+        return (
+            <Image src="/icons/typescript.svg" alt="" width={16} height={16} />
+        );
+    }
+    if (kind === 'vue') return <strong>V</strong>;
+    if (kind === 'vite') return <Zap size={14} />;
+    if (kind === 'tailwind') return <Wind size={14} />;
+    if (kind === 'router') return <Route size={14} />;
+    if (kind === 'motion') return <Move size={14} />;
+    if (kind === 'shadcn') return <Blocks size={14} />;
+    if (kind === 'embla') return <GalleryHorizontal size={14} />;
+    return <Radio size={14} />;
+}

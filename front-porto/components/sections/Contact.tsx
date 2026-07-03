@@ -1,180 +1,264 @@
 'use client';
 
-import { useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
+import {
+    BriefcaseBusiness,
+    Code,
+    FileText,
+    Mail,
+    MessageCircle,
+    Send,
+    X,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import GlassCard from '@/components/ui/GlassCard';
-import { motion } from 'framer-motion';
+
+const email = 'nugrohosantoso454@gmail.com';
+const whatsappBaseUrl = 'https://api.whatsapp.com/send/?phone=6281296653845';
+
+type ComposerType = 'email' | 'whatsapp';
+
+const socials = [
+    {
+        label: 'GitHub',
+        href: 'https://github.com/TossoTosca',
+        icon: Code,
+    },
+    {
+        label: 'LinkedIn',
+        href: 'https://linkedin.com/in/santoso-nugroho-35615b173',
+        icon: BriefcaseBusiness,
+    },
+];
 
 export default function Contact() {
-    const [copied, setCopied] = useState(false);
+    const [composer, setComposer] = useState<ComposerType | null>(null);
+    const [name, setName] = useState('');
+    const [subject, setSubject] = useState('');
+    const [message, setMessage] = useState('');
 
-    const email = 'nugrohosantoso454@gmail.com';
+    const openComposer = (type: ComposerType) => {
+        setComposer(type);
+        setName('');
+        setSubject('');
+        setMessage('');
+    };
 
-    const copyEmail = async () => {
-        await navigator.clipboard.writeText(email);
-        setCopied(true);
+    useEffect(() => {
+        if (!composer) return;
 
-        setTimeout(() => setCopied(false), 1500);
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') setComposer(null);
+        };
+
+        document.addEventListener('keydown', closeOnEscape);
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            document.removeEventListener('keydown', closeOnEscape);
+        };
+    }, [composer]);
+
+    const sendMessage = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        if (composer === 'whatsapp') {
+            const text = `Halo Santoso, saya ${name.trim()}.\n\n${message.trim()}`;
+            const url = `${whatsappBaseUrl}&text=${encodeURIComponent(text)}&type=phone_number&app_absent=0`;
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+
+        if (composer === 'email') {
+            const emailSubject =
+                subject.trim() || `Portfolio inquiry from ${name.trim()}`;
+            const body = `Hi Santoso,\n\n${message.trim()}\n\nRegards,\n${name.trim()}`;
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        setComposer(null);
     };
 
     return (
-        <section
-            id="contact"
-            style={{
-                minHeight: '100vh',
-                padding: '120px 24px',
-                display: 'flex',
-                alignItems: 'center',
-            }}
-        >
-            <div
-                style={{
-                    maxWidth: '900px',
-                    margin: '0 auto',
-                    width: '100%',
-                }}
-            >
-                {/* HEADER */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ duration: 0.6 }}
-                    style={{ marginBottom: 40 }}
-                >
-                    <div
-                        style={{
-                            fontSize: 14,
-                            letterSpacing: 2,
-                            color: 'var(--text-secondary)',
-                        }}
-                    >
-                        CONTACT
+        <section id="contact" className="contact-section section-shell">
+            <div className="section-container contact-container">
+                <p className="section-eyebrow">CONTACT</p>
+                <h2 className="contact-title">
+                    Have an idea worth building?
+                    <span> Let&apos;s talk.</span>
+                </h2>
+                <p className="section-lead">
+                    I&apos;m open to thoughtful collaborations, product work,
+                    and full stack opportunities.
+                </p>
+
+                <GlassCard className="contact-card">
+                    <div className="contact-primary">
+                        <span className="contact-icon">
+                            <Mail size={20} />
+                        </span>
+                        <div>
+                            <small>EMAIL</small>
+                            <span className="contact-email-address">
+                                {email}
+                            </span>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => openComposer('email')}
+                        >
+                            <Mail size={17} /> Write email
+                        </button>
                     </div>
 
-                    <h2 style={{ fontSize: 42, fontWeight: 600 }}>
-                        Let’s Work Together
-                    </h2>
-
-                    <p
-                        style={{
-                            marginTop: 10,
-                            color: 'var(--text-secondary)',
-                        }}
-                    >
-                        Feel free to reach out for collaboration or job
-                        opportunities.
-                    </p>
-                </motion.div>
-
-                {/* CARD */}
-                <GlassCard
-                    style={{
-                        borderRadius: 24,
-                        padding: 30,
-                    }}
-                >
-                    {/* EMAIL SECTION */}
-                    <div style={{ marginBottom: 30 }}>
-                        <div
-                            style={{
-                                fontSize: 12,
-                                color: 'var(--text-secondary)',
-                                marginBottom: 8,
-                            }}
-                        >
-                            EMAIL
-                        </div>
-
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                gap: 10,
-                            }}
-                        >
-                            <span style={{ fontSize: 18 }}>{email}</span>
-
-                            <button onClick={copyEmail} style={btnStyle}>
-                                {copied ? 'Copied!' : 'Copy'}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* SOCIALS */}
-                    <div style={{ marginBottom: 30 }}>
-                        <div
-                            style={{
-                                fontSize: 12,
-                                color: 'var(--text-secondary)',
-                                marginBottom: 10,
-                            }}
-                        >
-                            SOCIALS
-                        </div>
-
-                        <div
-                            style={{
-                                display: 'flex',
-                                gap: 12,
-                                flexWrap: 'wrap',
-                            }}
-                        >
+                    <div className="contact-links">
+                        {socials.map(({ label, href, icon: Icon }) => (
                             <a
-                                href="https://github.com/TossoTosca"
+                                key={label}
+                                href={href}
                                 target="_blank"
-                                style={linkBtn}
+                                rel="noreferrer"
                             >
-                                GitHub
+                                <Icon size={18} /> {label}
                             </a>
-
-                            <a
-                                href="https://linkedin.com/in/santoso-nugroho-35615b173"
-                                target="_blank"
-                                style={linkBtn}
-                            >
-                                LinkedIn
-                            </a>
-
-                            <a
-                                href="https://wa.me/6285731695548"
-                                target="_blank"
-                                style={linkBtn}
-                            >
-                                WhatsApp
-                            </a>
-                        </div>
-                    </div>
-
-                    {/* FOOTER NOTE */}
-                    <div
-                        style={{
-                            fontSize: 12,
-                            color: 'var(--text-secondary)',
-                        }}
-                    >
-                        Usually respond within 24–48 hours.
+                        ))}
+                        <button
+                            type="button"
+                            onClick={() => openComposer('whatsapp')}
+                        >
+                            <MessageCircle size={18} /> WhatsApp
+                        </button>
+                        <a
+                            href="/resume/Santoso-Nugroho-CV.pdf"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <FileText size={18} /> View Resume
+                        </a>
                     </div>
                 </GlassCard>
+
+                <footer className="site-footer">
+                    <span>Designed and built by Santoso Nugroho.</span>
+                    <span>© {new Date().getFullYear()}</span>
+                </footer>
             </div>
+
+            <AnimatePresence>
+                {composer && (
+                    <motion.div
+                        className="contact-composer-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onMouseDown={() => setComposer(null)}
+                    >
+                        <motion.div
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="contact-composer-title"
+                            className="contact-composer-dialog"
+                            initial={{ opacity: 0, scale: 0.97, y: 18 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.98, y: 8 }}
+                            transition={{ duration: 0.22 }}
+                            onMouseDown={(event) => event.stopPropagation()}
+                        >
+                            <GlassCard className="contact-composer-card">
+                                <button
+                                    type="button"
+                                    className="composer-close"
+                                    aria-label="Close message form"
+                                    onClick={() => setComposer(null)}
+                                >
+                                    <X size={19} />
+                                </button>
+                                <span className="composer-icon">
+                                    {composer === 'whatsapp' ? (
+                                        <MessageCircle size={22} />
+                                    ) : (
+                                        <Mail size={22} />
+                                    )}
+                                </span>
+                                <p className="section-eyebrow">
+                                    {composer === 'whatsapp'
+                                        ? 'WHATSAPP MESSAGE'
+                                        : 'EMAIL MESSAGE'}
+                                </p>
+                                <h3 id="contact-composer-title">
+                                    {composer === 'whatsapp'
+                                        ? 'Start a WhatsApp conversation'
+                                        : 'Write me an email'}
+                                </h3>
+                                <p className="composer-intro">
+                                    Compose your message here. You can review it
+                                    once more in{' '}
+                                    {composer === 'whatsapp'
+                                        ? 'WhatsApp'
+                                        : 'your email app'}{' '}
+                                    before sending.
+                                </p>
+
+                                <form onSubmit={sendMessage}>
+                                    <label>
+                                        Your name
+                                        <input
+                                            value={name}
+                                            onChange={(event) =>
+                                                setName(event.target.value)
+                                            }
+                                            placeholder="How should I address you?"
+                                            autoComplete="name"
+                                            required
+                                            autoFocus
+                                        />
+                                    </label>
+
+                                    {composer === 'email' && (
+                                        <label>
+                                            Subject
+                                            <input
+                                                value={subject}
+                                                onChange={(event) =>
+                                                    setSubject(
+                                                        event.target.value
+                                                    )
+                                                }
+                                                placeholder="Project, role, or collaboration"
+                                            />
+                                        </label>
+                                    )}
+
+                                    <label>
+                                        Message
+                                        <textarea
+                                            value={message}
+                                            onChange={(event) =>
+                                                setMessage(event.target.value)
+                                            }
+                                            placeholder="Tell me a little about what you have in mind..."
+                                            rows={5}
+                                            required
+                                        />
+                                    </label>
+
+                                    <button
+                                        type="submit"
+                                        className="button button-primary composer-submit"
+                                    >
+                                        Continue to{' '}
+                                        {composer === 'whatsapp'
+                                            ? 'WhatsApp'
+                                            : 'email'}
+                                        <Send size={16} />
+                                    </button>
+                                </form>
+                            </GlassCard>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </section>
     );
 }
-
-// ===================== STYLES =====================
-
-const btnStyle: React.CSSProperties = {
-    padding: '8px 14px',
-    borderRadius: 999,
-    border: '1px solid #ccc',
-    background: 'transparent',
-    cursor: 'pointer',
-};
-
-const linkBtn: React.CSSProperties = {
-    padding: '8px 14px',
-    borderRadius: 999,
-    border: '1px solid #ccc',
-    textDecoration: 'none',
-    color: 'inherit',
-};

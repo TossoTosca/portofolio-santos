@@ -1,105 +1,139 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { Menu, X } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
-import useScroll from '@/hooks/useScroll';
+
+const navigation = ['Home', 'About', 'Skills', 'Projects', 'Contact'];
 
 export default function Navbar() {
-    const scrollY = useScroll();
+    const [activeSection, setActiveSection] = useState('home');
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
 
-    const isScrolled = scrollY > 20;
+    useEffect(() => {
+        const handleScroll = () => {
+            const nextState = window.scrollY > 20;
+            setIsScrolled((current) =>
+                current === nextState ? current : nextState
+            );
+        };
+
+        handleScroll();
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
+        const sections = navigation
+            .map((item) => document.getElementById(item.toLowerCase()))
+            .filter((section): section is HTMLElement => Boolean(section));
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const visible = entries
+                    .filter((entry) => entry.isIntersecting)
+                    .sort(
+                        (a, b) => b.intersectionRatio - a.intersectionRatio
+                    )[0];
+
+                if (visible) setActiveSection(visible.target.id);
+            },
+            { rootMargin: '-25% 0px -60% 0px', threshold: [0, 0.2, 0.5] }
+        );
+
+        sections.forEach((section) => observer.observe(section));
+        return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+        if (!menuOpen) return;
+
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') setMenuOpen(false);
+        };
+
+        document.addEventListener('keydown', closeOnEscape);
+        return () => document.removeEventListener('keydown', closeOnEscape);
+    }, [menuOpen]);
+
     return (
-        <div
-            style={{
-                position: 'fixed',
-                top: '18px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 1000,
-            }}
-        >
+        <header className="navbar-shell">
             <GlassCard
                 isScrolled={isScrolled}
-                style={{
-                    padding: '10px 14px',
-                    borderRadius: '999px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '28px',
-
-                    // ✨ iOS glass upgrade
-                    background: 'rgba(255,255,255,0.55)',
-                    backdropFilter: 'blur(24px)',
-                    WebkitBackdropFilter: 'blur(24px)',
-                    border: '1px solid rgba(255,255,255,0.4)',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-                }}
+                className="navbar-card"
+                aria-label="Primary navigation"
             >
-                {/* Logo */}
-                <div
-                    style={{
-                        fontWeight: 700,
-                        fontSize: '14px',
-                        letterSpacing: '1px',
-                        color: 'var(--text-primary)',
-                        padding: '6px 10px',
-                        borderRadius: '999px',
-                        background: 'rgba(255,255,255,0.4)',
-                    }}
+                <a
+                    className="navbar-logo"
+                    href="#home"
+                    aria-label="Santoso Nugroho — back to home"
+                    onClick={() => setMenuOpen(false)}
                 >
-                    SN
-                </div>
+                    <Image
+                        src="/icons/SN_Favicon/android-chrome-192x192.png"
+                        alt=""
+                        width={34}
+                        height={34}
+                        priority
+                    />
+                    <span>Santoso</span>
+                </a>
 
-                {/* Menu */}
-                <div
-                    style={{
-                        display: 'flex',
-                        gap: '18px',
-                        fontSize: '13px',
-                        color: 'var(--text-secondary)',
-                    }}
-                >
-                    {['Home', 'About', 'Skills', 'Projects', 'Contact'].map(
-                        (item) => (
+                <nav className="navbar-links" aria-label="Page sections">
+                    {navigation.map((item) => {
+                        const id = item.toLowerCase();
+                        return (
                             <a
                                 key={item}
-                                href={`#${item.toLowerCase()}`}
-                                style={{
-                                    padding: '6px 10px',
-                                    borderRadius: '999px',
-                                    transition: 'all 0.2s ease',
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.background =
-                                        'rgba(0,122,255,0.1)';
-                                    e.currentTarget.style.color =
-                                        'var(--accent)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background =
-                                        'transparent';
-                                    e.currentTarget.style.color =
-                                        'var(--text-secondary)';
-                                }}
+                                href={`#${id}`}
+                                className={
+                                    activeSection === id ? 'is-active' : ''
+                                }
+                                aria-current={
+                                    activeSection === id
+                                        ? 'location'
+                                        : undefined
+                                }
                             >
                                 {item}
                             </a>
-                        )
-                    )}
-                </div>
+                        );
+                    })}
+                </nav>
 
-                {/* Right side */}
-                <div
-                    style={{
-                        fontSize: '14px',
-                        padding: '6px 10px',
-                        borderRadius: '999px',
-                        background: 'rgba(255,255,255,0.4)',
-                        cursor: 'pointer',
-                    }}
+                <button
+                    className="navbar-menu-button"
+                    type="button"
+                    aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                    aria-expanded={menuOpen}
+                    aria-controls="mobile-navigation"
+                    onClick={() => setMenuOpen((open) => !open)}
                 >
-                    ☀️
-                </div>
+                    {menuOpen ? <X size={19} /> : <Menu size={19} />}
+                </button>
             </GlassCard>
-        </div>
+
+            {menuOpen && (
+                <GlassCard id="mobile-navigation" className="mobile-navigation">
+                    {navigation.map((item) => {
+                        const id = item.toLowerCase();
+                        return (
+                            <a
+                                key={item}
+                                href={`#${id}`}
+                                className={
+                                    activeSection === id ? 'is-active' : ''
+                                }
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                {item}
+                            </a>
+                        );
+                    })}
+                </GlassCard>
+            )}
+        </header>
     );
 }

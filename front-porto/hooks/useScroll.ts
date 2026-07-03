@@ -10,7 +10,8 @@ export default function useScroll() {
             setScrollY(window.scrollY);
         };
 
-        window.addEventListener('scroll', handleScroll);
+        handleScroll();
+        window.addEventListener('scroll', handleScroll, { passive: true });
 
         return () => {
             window.removeEventListener('scroll', handleScroll);

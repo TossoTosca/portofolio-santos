@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Santoso Nugroho Portfolio
 
-## Getting Started
+Personal portfolio built with Next.js, TypeScript, React, Framer Motion, and an Apple/iOS-inspired glass design system.
 
-First, run the development server:
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Quality checks
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Run these before every deployment:
 
-## Learn More
+```bash
+npm run lint
+npm run format:check
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+The site is prerendered as static content. The current build also generates `/robots.txt` and `/sitemap.xml`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Copy `.env.example` to `.env.local`, then replace the example value with the final production URL:
 
-## Deploy on Vercel
+```env
+NEXT_PUBLIC_SITE_URL=https://portofolio-santos.vercel.app
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+On Vercel, add the same variable in Project Settings → Environment Variables. If it is not set, the app can use Vercel's production URL automatically; setting it explicitly is recommended for canonical metadata.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Vercel deployment
+
+1. Make sure the final assets listed in `docs/assets-needed.md` have been supplied.
+2. Confirm `NEXT_PUBLIC_SITE_URL` is set to `https://portofolio-santos.vercel.app`.
+3. Run the quality checks above.
+4. Push the stable branch to GitHub and merge it into `main`.
+5. Import the repository in Vercel. If the repository root is imported, set **Root Directory** to `front-porto`.
+6. Keep the default Next.js build command (`npm run build`) and deploy.
+7. After deployment, verify `/`, `/robots.txt`, `/sitemap.xml`, project links, social links, and the mobile menu.
+
+No manual server or database setup is required for the current portfolio.

@@ -15,23 +15,20 @@ export default function GlassCard({
 }: GlassCardProps) {
     return (
         <div
-            {...props}
             style={{
                 background: isScrolled
                     ? 'rgba(255,255,255,0.75)'
-                    : 'rgba(255,255,255,0.55)',
+                    : 'var(--surface)',
 
-                border: '1px solid rgba(255,255,255,0.4)',
+                border: '1px solid var(--border)',
                 borderRadius: '999px',
-                backdropFilter: isScrolled ? 'blur(28px)' : 'blur(18px)',
-                WebkitBackdropFilter: isScrolled ? 'blur(28px)' : 'blur(18px)',
+                backdropFilter: isScrolled ? 'blur(20px)' : undefined,
+                WebkitBackdropFilter: isScrolled ? 'blur(20px)' : undefined,
                 boxShadow: isScrolled
                     ? '0 20px 60px rgba(0,0,0,0.12)'
                     : '0 10px 30px rgba(0,0,0,0.08)',
 
                 transition: 'all 0.35s ease',
-                willChange: 'transform, backdrop-filter, box-shadow',
-
                 ...style,
             }}
             {...props}

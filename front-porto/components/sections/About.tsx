@@ -1,92 +1,59 @@
-'use client';
-
+import { Compass, Layers3, Sparkles } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
+
+const principles = [
+    {
+        icon: Compass,
+        title: 'Curious by default',
+        text: 'I enjoy exploring unfamiliar problems and turning what I learn into practical improvements.',
+    },
+    {
+        icon: Layers3,
+        title: 'End-to-end thinking',
+        text: 'I connect product intent, interface details, application logic, and data into one coherent experience.',
+    },
+    {
+        icon: Sparkles,
+        title: 'Care in the details',
+        text: 'Performance, accessibility, and clear interactions are part of the product—not a final polish pass.',
+    },
+];
 
 export default function About() {
     return (
-        <section
-            id="about"
-            style={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                padding: '120px 24px',
-            }}
-        >
-            <div
-                style={{
-                    maxWidth: '1100px',
-                    margin: '0 auto',
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '60px',
-                    alignItems: 'center',
-                }}
-            >
-                {/* LEFT: TEXT  INI nantinya di ubah lagi , harus lebih menjual dengan menceritakan bahwa suka explor dan lain lain intinya yapping ...*/}
-                <div>
-                    <div
-                        style={{
-                            fontSize: '14px',
-                            letterSpacing: '2px',
-                            color: 'var(--text-secondary)',
-                            marginBottom: '12px',
-                        }}
-                    >
-                        ABOUT ME
-                    </div>
-
-                    <h2
-                        style={{
-                            fontSize: '42px',
-                            fontWeight: 600,
-                            lineHeight: 1.2,
-                            marginBottom: '20px',
-                        }}
-                    >
-                        I build clean, scalable, and performant digital
-                        experiences.
+        <section id="about" className="content-section section-shell">
+            <div className="section-container about-layout">
+                <div className="about-copy">
+                    <p className="section-eyebrow">ABOUT ME</p>
+                    <h2 className="section-title">
+                        Building with curiosity, clarity, and a product mindset.
                     </h2>
-
-                    <p
-                        style={{
-                            fontSize: '18px',
-                            color: 'var(--text-secondary)',
-                            lineHeight: 1.7,
-                            marginBottom: '16px',
-                        }}
-                    >
-                        I’m a Full Stack Developer focused on modern web
-                        technologies like JavaScript, TypeScript, React, and
-                        Node.js.
+                    <p className="section-lead">
+                        I&apos;m a full stack developer who likes to understand
+                        how things work—not only enough to ship them, but enough
+                        to make them simpler, faster, and easier to maintain.
                     </p>
-
-                    <p
-                        style={{
-                            fontSize: '18px',
-                            color: 'var(--text-secondary)',
-                            lineHeight: 1.7,
-                        }}
-                    >
-                        I enjoy building interfaces that feel smooth, fast, and
-                        intuitive—just like a product, not just a website.
+                    <p className="section-body">
+                        My work moves comfortably between frontend experiences,
+                        backend services, and databases. I value thoughtful
+                        collaboration and products that feel calm and intuitive
+                        to the people using them.
                     </p>
                 </div>
 
-                {/* RIGHT: VISUAL */}
-                <GlassCard
-                    style={{
-                        height: '360px',
-                        borderRadius: '24px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'var(--text-secondary)',
-                        fontSize: '14px',
-                    }}
-                >
-                    Developer Visual / Photo / Code Preview
-                </GlassCard>
+                <div className="principles-grid">
+                    {principles.map(({ icon: Icon, title, text }) => (
+                        <GlassCard key={title} className="principle-card">
+                            <span className="principle-icon">
+                                <Icon size={20} aria-hidden="true" />
+                            </span>
+                            <div>
+                                <h3>{title}</h3>
+                                <p>{text}</p>
+                            </div>
+                        </GlassCard>
+                    ))}
+                </div>
             </div>
         </section>
     );
