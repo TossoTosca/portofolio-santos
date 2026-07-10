@@ -17,18 +17,17 @@ export default function GlassCard({
         <div
             style={{
                 background: isScrolled
-                    ? 'rgba(255,255,255,0.75)'
+                    ? 'rgba(255, 255, 255, 0.92)'
                     : 'var(--surface)',
 
                 border: '1px solid var(--border)',
                 borderRadius: '999px',
-                backdropFilter: isScrolled ? 'blur(20px)' : undefined,
-                WebkitBackdropFilter: isScrolled ? 'blur(20px)' : undefined,
                 boxShadow: isScrolled
-                    ? '0 20px 60px rgba(0,0,0,0.12)'
-                    : '0 10px 30px rgba(0,0,0,0.08)',
+                    ? '0 18px 48px rgba(0, 0, 0, 0.12)'
+                    : '0 10px 30px rgba(0, 0, 0, 0.08)',
 
-                transition: 'all 0.35s ease',
+                transition:
+                    'background-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease',
                 ...style,
             }}
             {...props}

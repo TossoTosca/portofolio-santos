@@ -61,7 +61,7 @@ export default function Navbar() {
     return (
         <header className="navbar-shell">
             <GlassCard
-                isScrolled={isScrolled}
+                isScrolled={isScrolled || menuOpen}
                 className="navbar-card"
                 aria-label="Primary navigation"
             >
@@ -116,7 +116,11 @@ export default function Navbar() {
             </GlassCard>
 
             {menuOpen && (
-                <GlassCard id="mobile-navigation" className="mobile-navigation">
+                <GlassCard
+                    id="mobile-navigation"
+                    className="mobile-navigation"
+                    isScrolled
+                >
                     {navigation.map((item) => {
                         const id = item.toLowerCase();
                         return (

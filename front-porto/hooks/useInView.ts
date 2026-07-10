@@ -9,7 +9,9 @@ export default function useInView<T extends HTMLElement>() {
     useEffect(() => {
         const observer = new IntersectionObserver(
             ([entry]) => {
-                setIsInView(entry.isIntersecting);
+                if (!entry.isIntersecting) return;
+                setIsInView(true);
+                observer.disconnect();
             },
             {
                 threshold: 0.15,

@@ -1,10 +1,5 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { getSiteUrl } from '@/lib/site';
-
-import 'primereact/resources/themes/lara-light-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
-import 'primeflex/primeflex.css';
 
 import './globals.css';
 
@@ -55,6 +50,13 @@ export const metadata: Metadata = {
         apple: '/icons/SN_Favicon/apple-touch-icon.png',
     },
     robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
+    themeColor: '#f5f5f7',
 };
 
 export default function RootLayout({

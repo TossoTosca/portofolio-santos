@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -151,9 +152,11 @@ export default function Projects() {
     useEffect(() => {
         if (selectedIndex === null) return;
 
-        const previousOverflow = document.body.style.overflow;
+        const previousBodyOverflow = document.body.style.overflow;
+        const previousHtmlOverflow = document.documentElement.style.overflow;
         const imageCount = projects[selectedIndex].images.length;
         document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
 
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') setSelectedIndex(null);
@@ -169,10 +172,167 @@ export default function Projects() {
 
         document.addEventListener('keydown', handleKeyDown);
         return () => {
-            document.body.style.overflow = previousOverflow;
+            document.body.style.overflow = previousBodyOverflow;
+            document.documentElement.style.overflow = previousHtmlOverflow;
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, [selectedIndex]);
+
+    const projectDialog =
+        selected && selectedIndex !== null ? (
+            <AnimatePresence>
+                <motion.div
+                    className="project-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onMouseDown={() => setSelectedIndex(null)}
+                >
+                    <motion.div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="project-dialog-title"
+                        className="project-dialog"
+                        initial={{ opacity: 0, scale: 0.97, y: 16 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.98, y: 8 }}
+                        transition={{ duration: 0.24 }}
+                        onMouseDown={(event) => event.stopPropagation()}
+                    >
+                        <GlassCard className="project-dialog-card">
+                            <button
+                                type="button"
+                                className="dialog-close"
+                                aria-label="Close project details"
+                                onClick={() => setSelectedIndex(null)}
+                                autoFocus
+                            >
+                                <X size={19} />
+                            </button>
+
+                            <div className="project-gallery">
+                                <div className="dialog-image-wrap">
+                                    <AnimatePresence
+                                        mode="wait"
+                                        initial={false}
+                                    >
+                                        <motion.div
+                                            key={selected.images[galleryIndex]}
+                                            className="dialog-image-motion"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.18 }}
+                                        >
+                                            <Image
+                                                src={
+                                                    selected.images[
+                                                        galleryIndex
+                                                    ]
+                                                }
+                                                alt={`${selected.title} screen ${galleryIndex + 1}`}
+                                                fill
+                                                sizes="(max-width: 820px) 92vw, 56vw"
+                                                priority
+                                            />
+                                        </motion.div>
+                                    </AnimatePresence>
+                                    <div className="gallery-controls">
+                                        <button
+                                            type="button"
+                                            onClick={() => moveGallery(-1)}
+                                            aria-label="Previous project image"
+                                        >
+                                            <ArrowLeft size={18} />
+                                        </button>
+                                        <span>
+                                            {galleryIndex + 1} /{' '}
+                                            {selected.images.length}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => moveGallery(1)}
+                                            aria-label="Next project image"
+                                        >
+                                            <ArrowRight size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="gallery-thumbnails">
+                                    {selected.images.map((image, index) => (
+                                        <button
+                                            key={image}
+                                            type="button"
+                                            className={
+                                                galleryIndex === index
+                                                    ? 'is-active'
+                                                    : ''
+                                            }
+                                            onClick={() =>
+                                                setGalleryIndex(index)
+                                            }
+                                            aria-label={`Show image ${index + 1}`}
+                                        >
+                                            <Image
+                                                src={image}
+                                                alt=""
+                                                fill
+                                                sizes="90px"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="dialog-copy">
+                                <p className="section-eyebrow">
+                                    {selected.eyebrow}
+                                </p>
+                                <h2 id="project-dialog-title">
+                                    {selected.title}
+                                </h2>
+                                <p className="dialog-description">
+                                    {selected.description}
+                                </p>
+                                <p className="dialog-story">{selected.story}</p>
+                                <div className="project-tech-list">
+                                    {selected.tech.map((technology) => (
+                                        <TechBadge
+                                            key={technology.name}
+                                            technology={technology}
+                                        />
+                                    ))}
+                                </div>
+                                <a
+                                    className="button button-primary"
+                                    href={selected.liveUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    Visit live project{' '}
+                                    <ExternalLink size={16} />
+                                </a>
+                                <div className="dialog-navigation">
+                                    <button
+                                        type="button"
+                                        onClick={() => moveProject(-1)}
+                                    >
+                                        <ArrowLeft size={17} /> Previous project
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => moveProject(1)}
+                                    >
+                                        Next project <ArrowRight size={17} />
+                                    </button>
+                                </div>
+                            </div>
+                        </GlassCard>
+                    </motion.div>
+                </motion.div>
+            </AnimatePresence>
+        ) : null;
 
     return (
         <section id="projects" className="content-section section-shell">
@@ -252,168 +412,7 @@ export default function Projects() {
                 </div>
             </div>
 
-            <AnimatePresence>
-                {selected && selectedIndex !== null && (
-                    <motion.div
-                        className="project-overlay"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onMouseDown={() => setSelectedIndex(null)}
-                    >
-                        <motion.div
-                            role="dialog"
-                            aria-modal="true"
-                            aria-labelledby="project-dialog-title"
-                            className="project-dialog"
-                            initial={{ opacity: 0, scale: 0.97, y: 16 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.98, y: 8 }}
-                            transition={{ duration: 0.24 }}
-                            onMouseDown={(event) => event.stopPropagation()}
-                        >
-                            <GlassCard className="project-dialog-card">
-                                <button
-                                    type="button"
-                                    className="dialog-close"
-                                    aria-label="Close project details"
-                                    onClick={() => setSelectedIndex(null)}
-                                    autoFocus
-                                >
-                                    <X size={19} />
-                                </button>
-
-                                <div className="project-gallery">
-                                    <div className="dialog-image-wrap">
-                                        <AnimatePresence
-                                            mode="wait"
-                                            initial={false}
-                                        >
-                                            <motion.div
-                                                key={
-                                                    selected.images[
-                                                        galleryIndex
-                                                    ]
-                                                }
-                                                className="dialog-image-motion"
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                exit={{ opacity: 0 }}
-                                                transition={{ duration: 0.18 }}
-                                            >
-                                                <Image
-                                                    src={
-                                                        selected.images[
-                                                            galleryIndex
-                                                        ]
-                                                    }
-                                                    alt={`${selected.title} screen ${galleryIndex + 1}`}
-                                                    fill
-                                                    sizes="(max-width: 820px) 92vw, 56vw"
-                                                    priority
-                                                />
-                                            </motion.div>
-                                        </AnimatePresence>
-                                        <div className="gallery-controls">
-                                            <button
-                                                type="button"
-                                                onClick={() => moveGallery(-1)}
-                                                aria-label="Previous project image"
-                                            >
-                                                <ArrowLeft size={18} />
-                                            </button>
-                                            <span>
-                                                {galleryIndex + 1} /{' '}
-                                                {selected.images.length}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                onClick={() => moveGallery(1)}
-                                                aria-label="Next project image"
-                                            >
-                                                <ArrowRight size={18} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="gallery-thumbnails">
-                                        {selected.images.map((image, index) => (
-                                            <button
-                                                key={image}
-                                                type="button"
-                                                className={
-                                                    galleryIndex === index
-                                                        ? 'is-active'
-                                                        : ''
-                                                }
-                                                onClick={() =>
-                                                    setGalleryIndex(index)
-                                                }
-                                                aria-label={`Show image ${index + 1}`}
-                                            >
-                                                <Image
-                                                    src={image}
-                                                    alt=""
-                                                    fill
-                                                    sizes="90px"
-                                                />
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="dialog-copy">
-                                    <p className="section-eyebrow">
-                                        {selected.eyebrow}
-                                    </p>
-                                    <h2 id="project-dialog-title">
-                                        {selected.title}
-                                    </h2>
-                                    <p className="dialog-description">
-                                        {selected.description}
-                                    </p>
-                                    <p className="dialog-story">
-                                        {selected.story}
-                                    </p>
-                                    <div className="project-tech-list">
-                                        {selected.tech.map((technology) => (
-                                            <TechBadge
-                                                key={technology.name}
-                                                technology={technology}
-                                            />
-                                        ))}
-                                    </div>
-                                    <a
-                                        className="button button-primary"
-                                        href={selected.liveUrl}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        Visit live project{' '}
-                                        <ExternalLink size={16} />
-                                    </a>
-                                    <div className="dialog-navigation">
-                                        <button
-                                            type="button"
-                                            onClick={() => moveProject(-1)}
-                                        >
-                                            <ArrowLeft size={17} /> Previous
-                                            project
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => moveProject(1)}
-                                        >
-                                            Next project{' '}
-                                            <ArrowRight size={17} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </GlassCard>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {projectDialog ? createPortal(projectDialog, document.body) : null}
         </section>
     );
 }
